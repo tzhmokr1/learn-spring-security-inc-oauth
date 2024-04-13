@@ -46,22 +46,23 @@ public class LssSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {// @formatter:off
         http
-        .authorizeHttpRequests()
+        .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers("/badUser*","/js/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().authenticated())
 
-        .and()
-        .formLogin().
-            loginPage("/login").permitAll().
-            loginProcessingUrl("/doLogin")
-        
-        .and()
-        .logout().permitAll().logoutUrl("/logout")
-        
-        .and().sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry).and().sessionFixation().none()
+        .formLogin((form) -> form
+                .loginPage("/login").permitAll()
+                .loginProcessingUrl("/doLogin"))
 
-        .and()
-        .csrf().disable();
+        .logout((logout) -> logout
+                .permitAll().logoutUrl("/logout"))
+        
+        .sessionManagement((session) -> session
+                .sessionFixation((fixation) -> fixation.none())
+                .maximumSessions(1)
+                .sessionRegistry(sessionRegistry))
+
+        .csrf((csrf) -> csrf.disable());
         return http.build();
     } // @formatter:on
 
